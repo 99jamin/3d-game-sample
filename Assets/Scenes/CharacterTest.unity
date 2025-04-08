@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateSpeed: 100
-  jumpForce: 5
+  jumpForce: 2
 --- !u!143 &944911300
 CharacterController:
   m_ObjectHideFlags: 0

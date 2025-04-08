@@ -12,7 +12,8 @@ public class PlayerController : MonoBehaviour
     private static readonly int Speed = Animator.StringToHash("Speed");
 
     [SerializeField] private float rotateSpeed = 100f;
-    [SerializeField] private float jumpForce = 5;
+    [SerializeField] private float jumpForce = 2;
+    [SerializeField] private LayerMask groundLayer;     // 땅으로 인식할 레이어
     
     private CharacterController _characterController;
     private Animator _animator;
@@ -56,6 +57,9 @@ public class PlayerController : MonoBehaviour
         
         HandleMovement();
         CheckRun();
+        
+        // 점프 높이 설정
+        _animator.SetFloat("GroundDistance", GetDistanceToGround());
     }
 
     // 사용자 입력 처리 함수
@@ -76,6 +80,14 @@ public class PlayerController : MonoBehaviour
 
         Vector3 movement = transform.forward * vertical;
         transform.Rotate(0, horizontal * rotateSpeed * Time.deltaTime, 0);
+        
+        // 점프
+        if (Input.GetButtonDown("Jump") && IsGrounded)
+        {
+            _velocity.y = Mathf.Sqrt(jumpForce * -2f * _gravity);
+            _animator.SetTrigger("Jump2");
+        }
+        
     }
     
     // 달리기 처리
@@ -98,7 +110,7 @@ public class PlayerController : MonoBehaviour
     {
         float maxDistance = 10f;
         if (Physics.Raycast(transform.position, 
-                Vector3.down, out RaycastHit hit, maxDistance))
+                Vector3.down, out RaycastHit hit, maxDistance, groundLayer))
         {
             return hit.distance;
         }
@@ -118,7 +130,7 @@ public class PlayerController : MonoBehaviour
         
         // 중력 적용
         _velocity.y += _gravity * Time.deltaTime;
-        movePosition.y = _velocity.y;
+        movePosition.y = _velocity.y * Time.deltaTime;
         
         _characterController.Move(movePosition);
     }
