@@ -102,7 +102,29 @@ public class PlayerController : MonoBehaviour
         _playerStates[CurrentState].Enter(this);
     }
 
-    #region 애니메이터 관련
+    #region 동작 관련
+
+    public void Rotate(float x, float z)
+    {
+        // 카메라 설정
+        var cameraTransform = Camera.main.transform;
+        var cameraForward = cameraTransform.forward;
+        var cameraRight = cameraTransform.right;
+        
+        // Y 값을 0로 설정해서 수평 방향만 고려
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+        
+        // 입력 방향에 따라 카메라 기준으로 이동 방향 계산
+        var moveDirection = cameraForward * z + cameraRight * x;
+        
+        // 이동 방향이 있을 경우에만 회전
+        if (moveDirection != Vector3.zero)
+        {
+            moveDirection.Normalize();
+            transform.rotation = Quaternion.LookRotation(moveDirection);
+        }
+    }
 
     private void OnAnimatorMove()
     {
