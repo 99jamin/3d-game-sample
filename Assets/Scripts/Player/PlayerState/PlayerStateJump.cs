@@ -8,10 +8,12 @@ public class PlayerStateJump : MonoBehaviour, IPlayerState
 	{
    		_playerController = playerController;
 	    _playerController.Animator.SetBool("Jump", true);
+	    _playerController.Jump();
 	}
 
 	public void Update()
 	{
+		_playerController.Animator.SetFloat("GroundDistance", _playerController.GetDistanceToGround());
 	}
 
 	public void Exit()

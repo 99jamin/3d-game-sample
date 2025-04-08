@@ -126,6 +126,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void Jump()
+    {
+        _velocity.y = Mathf.Sqrt(jumpSpeed * -2f * _gravity);
+    }
+
     private void OnAnimatorMove()
     {
         Vector3 movePosition;
@@ -159,7 +164,7 @@ public class PlayerController : MonoBehaviour
     #region 계산관련
 
     // 바닥과 거리를 계산하는 함수
-    private float GetDistanceToGround()
+    public float GetDistanceToGround()
     {
         float maxDistance = 10f;
         if (Physics.Raycast(transform.position, 
