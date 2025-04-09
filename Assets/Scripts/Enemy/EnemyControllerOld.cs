@@ -21,10 +21,18 @@ public class EnemyControllerOld : MonoBehaviour
     private Animator _enemyAnimator;
     private NavMeshAgent _navMeshAgent;
 
+    // 적의 체력
     private int _currentHealth;
     
+    // 적의 현재 상태
     private EnemyState _currentState;
     public EnemyState CurrentState => _currentState;
+    
+    // 플레이어의 추적 위치를 업데이트 하는 코루틴
+    private Coroutine _updateDestinationCoroutine;
+
+    // 플레이어의 거리를 비교하기 위한 변수
+    private float _detectCircleRadiusSqr;
     
     // -----
     // AI
@@ -41,6 +49,7 @@ public class EnemyControllerOld : MonoBehaviour
     private void Start()
     {
         _currentHealth = maxHealth;
+        _detectCircleRadiusSqr = detectCircleRadius * detectCircleRadius;
         
         SetState(EnemyState.Idle);
     }
@@ -64,7 +73,15 @@ public class EnemyControllerOld : MonoBehaviour
             case EnemyState.Patrol:
                 break;
             case EnemyState.Trace:
+            {
+                // 일정 거리 이상으로 플레이어가 멀어지면 Idle로 전환
+                var playerDistanceSqr = (_playerTransform.position - transform.position).sqrMagnitude;
+                if (playerDistanceSqr > _detectCircleRadiusSqr)
+                {
+                    SetState(EnemyState.Idle);
+                }
                 break;
+            }
             case EnemyState.Attack:
                 break;
             case EnemyState.Hit:
@@ -97,8 +114,7 @@ public class EnemyControllerOld : MonoBehaviour
             {
                 // 감지된 플레이어를 향해 이동하기
                 _navMeshAgent.isStopped = false;
-                _navMeshAgent.SetDestination(_playerTransform.position);
-                
+                _updateDestinationCoroutine = StartCoroutine(UpdateDestination());                
                 // Trace 애니메이션 재생
                 _enemyAnimator.SetBool("Trace", true);
                 break;
@@ -128,6 +144,12 @@ public class EnemyControllerOld : MonoBehaviour
             }
             case EnemyState.Trace:
             {
+                // 플레이어 위치 갱신하는 코루틴 중지
+                if (_updateDestinationCoroutine != null)
+                {
+                    StopCoroutine(_updateDestinationCoroutine);
+                    _updateDestinationCoroutine = null;
+                }
                 // Trace 애니메이션 끄기
                 _enemyAnimator.SetBool("Trace", false);
                 break;
@@ -144,6 +166,15 @@ public class EnemyControllerOld : MonoBehaviour
     }
 
     #region 적 감지
+
+    IEnumerator UpdateDestination()
+    {
+        while (_playerTransform)
+        {
+            _navMeshAgent.SetDestination(_playerTransform.position);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
 
     // 일정 반경에 플레이어가 진입하면 플레이어 소리를 감지했다고 판단
     private Transform DetectPlayerInCircle()
