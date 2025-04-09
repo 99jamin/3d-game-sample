@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerStateAttack : MonoBehaviour, IPlayerState
 {
     private PlayerController _playerController;
+    public bool IsAttacking { get; set; }
 
     public void Enter(PlayerController playerController)
     {
@@ -12,6 +13,13 @@ public class PlayerStateAttack : MonoBehaviour, IPlayerState
 
     public void Update()
     {
+        if (Input.GetButtonDown("Fire1") 
+            && _playerController.IsGrounded
+            && !IsAttacking)
+        {
+            _playerController.Animator.SetTrigger("Attack");
+            return;
+        }
     }
 
     public void Exit()

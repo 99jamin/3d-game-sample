@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -78,5 +79,21 @@ public class PlayerControllerEditor : Editor
             playerController.SetState(PlayerState.Dead);
         
         EditorGUILayout.EndHorizontal();
+    }
+
+    private void OnEnable()
+    {
+        EditorApplication.update += OnEditorUpdate;
+    }
+
+    private void OnDisable()
+    {
+        EditorApplication.update -= OnEditorUpdate;
+    }
+
+    private void OnEditorUpdate()
+    {
+        if (target != null)
+            Repaint();
     }
 }

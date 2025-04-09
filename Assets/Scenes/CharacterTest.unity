@@ -455,7 +455,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1300706060}
   rotationSpeed: 100
-  distance: 5
+  distance: 3
 --- !u!4 &1260001420 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8355021597097927181, guid: 8a5f6586374326346ac1e1c3a0afc184, type: 3}
