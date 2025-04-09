@@ -107,7 +107,7 @@ PrefabInstance:
       addedObject: {fileID: 4048404481409853889}
     - targetCorrespondingSourceObject: {fileID: 100166, guid: a5674d01884853d4e8f2386a171e14d9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4743682884852440567}
+      addedObject: {fileID: 704077051087807848}
   m_SourcePrefab: {fileID: 100100000, guid: a5674d01884853d4e8f2386a171e14d9, type: 3}
 --- !u!1 &8355021597097769427 stripped
 GameObject:
@@ -140,7 +140,7 @@ CharacterController:
   m_SkinWidth: 0.001
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &4743682884852440567
+--- !u!114 &704077051087807848
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,15 +149,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 8355021597097769427}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82c6a3d6c6d851a47a7a8c0d968696f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 37a5546491501f6439e856cfa6360311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 100
-  jumpForce: 2
+  maxHealth: 100
+  attackPower: 10
+  jumpSpeed: 2
+  rotationSpeed: 100
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  cameraTransform: {fileID: 0}
+  maxGroundCheckDistance: 2
+  leftHandTransform: {fileID: 8355021597097927181}
+  headTransform: {fileID: 8104109740684903481}
+--- !u!4 &8355021597097927181 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400536, guid: a5674d01884853d4e8f2386a171e14d9, type: 3}
+  m_PrefabInstance: {fileID: 8355021597097803413}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8355021597097928115 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400166, guid: a5674d01884853d4e8f2386a171e14d9, type: 3}
