@@ -19,6 +19,7 @@ public class EnemyControllerOld : MonoBehaviour
     [SerializeField] private LayerMask targetLayer;
     [SerializeField] private float detectCircleRadius = 10f;
     [SerializeField] private float maxPatrolWaitTime = 3f;
+    [SerializeField] private float detectSightAngle = 30f;
     
     private Animator _enemyAnimator;
     private NavMeshAgent _navMeshAgent;
@@ -87,8 +88,15 @@ public class EnemyControllerOld : MonoBehaviour
             }
             case EnemyState.Patrol:
             {
-                Debug.Log("Remaining Distance : " + _navMeshAgent.remainingDistance);
-                Debug.Log("Path Pending : " + _navMeshAgent.pathPending);
+                // 플레이어 감지
+                var detectPlayer = DetectPlayerInCircle();
+                if (detectPlayer)
+                {
+                    _playerTransform = detectPlayer;
+                    SetState(EnemyState.Trace);
+                    break;
+                }
+                
                 // 패트롤 위치에 도착하면 Idle 상태로 전환
                 if (!_navMeshAgent.pathPending && _navMeshAgent.remainingDistance < 0.1f)
                 {
@@ -99,8 +107,20 @@ public class EnemyControllerOld : MonoBehaviour
             }
             case EnemyState.Trace:
             {
-                // 일정 거리 이상으로 플레이어가 멀어지면 Idle로 전환
+                // 플레이어와 거리 계산
                 var playerDistanceSqr = (_playerTransform.position - transform.position).sqrMagnitude;
+                
+                // 트레이스 중 시야에 플레이어가 들어오면 속도 증가
+                if (DetectPlayerInSight(_playerTransform))
+                {
+                    _enemyAnimator.SetFloat("Speed", 1f);
+                }
+                else
+                {
+                    _enemyAnimator.SetFloat("Speed", 0f);
+                }
+             
+                // 일정 거리 이상으로 플레이어가 멀어지면 Idle로 전환
                 if (playerDistanceSqr > _detectCircleRadiusSqr)
                 {
                     SetState(EnemyState.Idle);
@@ -245,7 +265,31 @@ public class EnemyControllerOld : MonoBehaviour
         }
     }
     
+    // 일정 반경에 플레이어가 진입하면 시야에 들어왔다고 판단하는 함수
+    private bool DetectPlayerInSight(Transform playerTransform)
+    {
+        if (playerTransform == null)
+        {
+            return false;
+        }
 
+        // Vector3 direction = playerTransform.position - transform.position;
+        // float angle = Vector3.Angle(direction, transform.forward);
+        
+        var cosTheta = Vector3.Dot(transform.forward, 
+            (playerTransform.position - transform.position).normalized);
+        var angle = Mathf.Acos(cosTheta) * Mathf.Rad2Deg;
+        
+        if (angle < detectSightAngle)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     #endregion
 
     #region 동작 처리
@@ -269,6 +313,14 @@ public class EnemyControllerOld : MonoBehaviour
         // Circle 감지 범위
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectCircleRadius);
+        
+        // 시야각
+        Gizmos.color = Color.red;
+        Vector3 rightDirection = Quaternion.Euler(0, detectSightAngle, 0) * transform.forward;
+        Vector3 leftDirection = Quaternion.Euler(0, -detectSightAngle, 0) * transform.forward;
+        Gizmos.DrawRay(transform.position, rightDirection * detectCircleRadius);
+        Gizmos.DrawRay(transform.position, leftDirection * detectCircleRadius);
+        Gizmos.DrawRay(transform.position, transform.forward * detectCircleRadius);
     }
 
     #endregion
