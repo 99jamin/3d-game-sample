@@ -19,10 +19,13 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float detectCircleRadius = 10f;
     public float DetectCircleRadius => detectCircleRadius;
     [SerializeField] private LayerMask targetLayerMask;
+    public LayerMask TargetLayerMask => targetLayerMask;
     [SerializeField] private float maxDetectSightAngle = 30f;
     public float MaxDetectSightAngle => maxDetectSightAngle;
     [SerializeField] private float maxPatrolWaitTime = 3f;
     public float MaxPatrolWaitTime => maxPatrolWaitTime;
+    [SerializeField] private float maxAttackDistance = 0.5f;
+    public float MaxAttackDistance => maxAttackDistance;
     
     // -----
     // 상태 변수
@@ -116,6 +119,16 @@ public class EnemyController : MonoBehaviour
     }
 
     public void Grunt()
+    {
+        
+    }
+
+    public void AttackBegin()
+    {
+        
+    }
+
+    public void AttackEnd()
     {
         
     }

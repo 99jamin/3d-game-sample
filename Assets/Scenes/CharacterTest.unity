@@ -3264,6 +3264,7 @@ MonoBehaviour:
     m_Bits: 64
   maxDetectSightAngle: 30
   maxPatrolWaitTime: 3
+  maxAttackDistance: 2
 --- !u!1001 &1865966973
 PrefabInstance:
   m_ObjectHideFlags: 0

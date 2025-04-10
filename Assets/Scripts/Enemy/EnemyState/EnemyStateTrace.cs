@@ -34,8 +34,11 @@ public class EnemyStateTrace : IEnemyState
         }
         _detectPlayerInCircleWaitTime += Time.deltaTime;
         
+        var playerDistanceSqr = 
+            (_detectPlayerTransform.position - _enemyController.transform.position).sqrMagnitude;
+        
         // 트레이스 중 시야에 플레이어가 들어오면 속도 증가
-        if (DetectPlayerInSight(_detectPlayerTransform))
+        if (DetectPlayerInSight(_detectPlayerTransform) && playerDistanceSqr > 9f)
         {
             _enemyController.EnemyAnimator.SetFloat("Speed", 1f);
         }
@@ -45,13 +48,24 @@ public class EnemyStateTrace : IEnemyState
         }
         
         // 플레이어를 감지할 수 있는 반경을 넘어서면 다시 아이들 상태로 전환
-        var playerDistanceSqr = 
-            (_detectPlayerTransform.position - _enemyController.transform.position).sqrMagnitude;
-
         if (playerDistanceSqr > (_enemyController.DetectCircleRadius * _enemyController.DetectCircleRadius))
         {
             _enemyController.SetState(EnemyState.Idle);
             return;
+        }
+        
+        // 전방에 플레이어가 있고, 공격 거리이면 공격 상태로 전환
+        RaycastHit hit;
+        Vector3 transformPosition = _enemyController.transform.position;
+        transformPosition.y = 1f;
+        if (Physics.Raycast(transformPosition,
+                _enemyController.transform.forward,
+                out hit,
+                _enemyController.MaxAttackDistance,
+                _enemyController.TargetLayerMask
+            ))
+        {
+            _enemyController.SetState(EnemyState.Attack);
         }
     }
 
