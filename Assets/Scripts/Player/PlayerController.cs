@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
     private const float _gravity = -9.81f;
     private Vector3 _velocity = Vector3.zero;
     private int _currentHealth = 0;
+    private WeaponController _weaponController;
 
     private void Awake()
     {
@@ -82,6 +83,12 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         
         // 체력 초기화
         _currentHealth = maxHealth;
+        
+        // 무기 할당
+        var staffObject = Resources.Load<GameObject>("Player/Weapon/Staff");
+        var staff = Instantiate(staffObject, leftHandTransform).GetComponent<WeaponController>();
+        staff.Subscribe(this);
+        _weaponController = staff;
     }
 
     private void Update()
@@ -185,17 +192,18 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
 
     public void OnNext(GameObject value)
     {
-
+        var enemyController = value.GetComponent<EnemyController>();
+        if (enemyController)
+        {
+            // TODO: EnemyController에게 "너 맞았어!"라고 알려주면 됩니다.
+        }
     }
 
-    public void OnError(Exception error)
-    {
-        
-    }
+    public void OnError(Exception error) { }
 
     public void OnCompleted()
     {
-        
+        _weaponController.Unsubscribe(this);
     }
     
     #endregion
