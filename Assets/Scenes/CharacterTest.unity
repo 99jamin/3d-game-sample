@@ -3221,26 +3221,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100002, guid: 2732fe64dd2799f439fb845921df626b, type: 3}
   m_PrefabInstance: {fileID: 1865966973}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1656806367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1656806366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e51620e703d7d6047b3fddfc5926caaf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackPower: 1
-  maxHealth: 100
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  detectCircleRadius: 10
-  maxPatrolWaitTime: 3
-  detectSightAngle: 30
 --- !u!195 &1656806370
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -3263,6 +3243,27 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1656806371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656806366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b40f1c2d0e4c85944b5ad730a79d289c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  attackPower: 10
+  defensePower: 5
+  detectCircleRadius: 10
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  maxDetectSightAngle: 30
+  maxPatrolWaitTime: 3
 --- !u!1001 &1865966973
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3329,10 +3330,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 100002, guid: 2732fe64dd2799f439fb845921df626b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1656806367}
+      addedObject: {fileID: 1656806370}
     - targetCorrespondingSourceObject: {fileID: 100002, guid: 2732fe64dd2799f439fb845921df626b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1656806370}
+      addedObject: {fileID: 1656806371}
   m_SourcePrefab: {fileID: 100100000, guid: 2732fe64dd2799f439fb845921df626b, type: 3}
 --- !u!1 &2139221499
 GameObject:

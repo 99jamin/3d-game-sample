@@ -20,6 +20,7 @@ public class EnemyController : MonoBehaviour
     public float DetectCircleRadius => detectCircleRadius;
     [SerializeField] private LayerMask targetLayerMask;
     [SerializeField] private float maxDetectSightAngle = 30f;
+    public float MaxDetectSightAngle => maxDetectSightAngle;
     [SerializeField] private float maxPatrolWaitTime = 3f;
     public float MaxPatrolWaitTime => maxPatrolWaitTime;
     
@@ -81,7 +82,10 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        
+        if (CurrentState != EnemyState.None)
+        {
+            _enemyStates[CurrentState].Update();
+        }
     }
 
     public void SetState(EnemyState newState)
@@ -107,6 +111,11 @@ public class EnemyController : MonoBehaviour
     }
 
     public void PlayStep()
+    {
+        
+    }
+
+    public void Grunt()
     {
         
     }
@@ -147,6 +156,14 @@ public class EnemyController : MonoBehaviour
          Gizmos.DrawRay(transform.position, rightDirection * detectCircleRadius);
          Gizmos.DrawRay(transform.position, leftDirection * detectCircleRadius);
          Gizmos.DrawRay(transform.position, transform.forward * detectCircleRadius);
+         
+         // Agent 목적지 시각화
+         if (Agent != null && Agent.hasPath)
+         {
+             Gizmos.color = Color.green;
+             Gizmos.DrawSphere(Agent.destination, 0.5f);
+             Gizmos.DrawLine(Agent.destination, Agent.destination);
+         }
      }
 
      #endregion
