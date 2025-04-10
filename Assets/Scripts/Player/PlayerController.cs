@@ -7,7 +7,7 @@ public enum PlayerState { None, Idle, Move, Jump, Attack, Hit, Dead }
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IObserver<GameObject>
 {
     [Header("Player")]
     [SerializeField] private int maxHealth = 100;
@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour
     private const float _gravity = -9.81f;
     private Vector3 _velocity = Vector3.zero;
     private int _currentHealth = 0;
+    private WeaponController _weaponController;
 
     private void Awake()
     {
@@ -82,6 +83,12 @@ public class PlayerController : MonoBehaviour
         
         // 체력 초기화
         _currentHealth = maxHealth;
+        
+        // 무기 할당
+        var staffObject = Resources.Load<GameObject>("Player/Weapon/Staff");
+        var staff = Instantiate(staffObject, leftHandTransform).GetComponent<WeaponController>();
+        staff.Subscribe(this);
+        _weaponController = staff;
     }
 
     private void Update()
@@ -181,4 +188,23 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region 무기 관련
+
+    public void OnNext(GameObject value)
+    {
+        var enemyController = value.GetComponent<EnemyController>();
+        if (enemyController)
+        {
+            // TODO: EnemyController에게 "너 맞았어!"라고 알려주면 됩니다.
+        }
+    }
+
+    public void OnError(Exception error) { }
+
+    public void OnCompleted()
+    {
+        _weaponController.Unsubscribe(this);
+    }
+    
+    #endregion
 }

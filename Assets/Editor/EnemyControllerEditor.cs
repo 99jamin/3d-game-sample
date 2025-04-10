@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(EnemyControllerOld))]
+[CustomEditor(typeof(EnemyController))]
 public class EnemyControllerEditor : Editor
 {
     public override void OnInspectorGUI()
@@ -10,7 +10,7 @@ public class EnemyControllerEditor : Editor
         base.OnInspectorGUI();
         
         // 타겟 컴포넌트 참조 가져오기
-        EnemyControllerOld enemyController = (EnemyControllerOld)target;
+        EnemyController enemyController = (EnemyController)target;
         
         // 여백 추가
         EditorGUILayout.Space();
