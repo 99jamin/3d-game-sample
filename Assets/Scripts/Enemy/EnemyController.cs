@@ -101,6 +101,15 @@ public class EnemyController : MonoBehaviour
         _enemyStates[CurrentState].Enter(this);
     }
 
+    #region Hit 관련
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("## Enemy OnTriggerEnter");
+    }
+
+    #endregion
+
     #region 이동 관련
 
     private void OnAnimatorMove()
