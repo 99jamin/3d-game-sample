@@ -103,9 +103,9 @@ public class EnemyController : MonoBehaviour
 
     #region Hit 관련
 
-    private void OnTriggerEnter(Collider other)
+    public void SetHit(PlayerController playerController)
     {
-        Debug.Log("## Enemy OnTriggerEnter");
+        
     }
 
     #endregion

@@ -52,7 +52,32 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
 
     private void FixedUpdate()
     {
-        
+        if (_isAttacking)
+        {
+            for (int i = 0; i < _triggerZones.Length; i++)
+            {
+                var worldPosition = transform.position + 
+                                    transform.TransformVector(_triggerZones[i].position);
+                var direction = worldPosition - _previousPositions[i];
+                _ray.origin = _previousPositions[i];
+                _ray.direction = direction;
+                
+                var hitCount = Physics.SphereCastNonAlloc(_ray, 
+                    _triggerZones[i].radius, _hits, 
+                    direction.magnitude, targetLayerMask,
+                    QueryTriggerInteraction.UseGlobal);
+                for (int j = 0; j < hitCount; j++)
+                {
+                    var hit = _hits[j];
+                    if (!_hitColliders.Contains(hit.collider))
+                    {
+                        _hitColliders.Add(hit.collider);
+                        Notify(hit.collider.gameObject);
+                    }
+                }
+                _previousPositions[i] = worldPosition;
+            }
+        }
     }
 
     public void Subscribe(IObserver<GameObject> observer)
@@ -89,10 +114,28 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
     
     private void OnDrawGizmos()
     {
-        foreach (var triggerZone in _triggerZones)
+        if (_isAttacking)
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(triggerZone.position, triggerZone.radius);
+            for (int i = 0; i < _triggerZones.Length; i++)
+            {
+                var worldPosition = transform.position +
+                                    transform.TransformVector(_triggerZones[i].position);
+                var direction = worldPosition - _previousPositions[i];
+                
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(worldPosition, _triggerZones[i].radius);
+                
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(worldPosition + direction, _triggerZones[i].radius);
+            }
+        }
+        else
+        {
+            foreach (var triggerZone in _triggerZones)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(triggerZone.position, triggerZone.radius);
+            }   
         }
     }
     

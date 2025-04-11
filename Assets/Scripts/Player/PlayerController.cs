@@ -195,7 +195,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         var enemyController = value.GetComponent<EnemyController>();
         if (enemyController)
         {
-            // TODO: EnemyController에게 "너 맞았어!"라고 알려주면 됩니다.
+            
         }
     }
 
