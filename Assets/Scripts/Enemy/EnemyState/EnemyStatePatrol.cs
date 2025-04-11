@@ -14,9 +14,12 @@ public class EnemyStatePatrol : IEnemyState
             _enemyController.SetState(EnemyState.Idle);
             return;
         }
-        
-        _enemyController.Agent.isStopped = false;
-        _enemyController.Agent.SetDestination(patrolPoint);
+
+        if (_enemyController.Agent.enabled == true)
+        {
+            _enemyController.Agent.isStopped = false;
+            _enemyController.Agent.SetDestination(patrolPoint);
+        }
         
         _enemyController.EnemyAnimator.SetBool("Patrol", true);
     }
