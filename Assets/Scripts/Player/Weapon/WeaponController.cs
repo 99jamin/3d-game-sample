@@ -71,8 +71,8 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
                     var hit = _hits[j];
                     if (!_hitColliders.Contains(hit.collider))
                     {
-                        Time.timeScale = 0f;
-                        StartCoroutine(ResumeTimeScale());
+                        // Time.timeScale = 0f;
+                        // StartCoroutine(ResumeTimeScale());
                         
                         _hitColliders.Add(hit.collider);
                         Notify(hit.collider.gameObject);
@@ -85,7 +85,7 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
 
     private IEnumerator ResumeTimeScale()
     {
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSecondsRealtime(10f);
         Time.timeScale = 1f;
     }
 

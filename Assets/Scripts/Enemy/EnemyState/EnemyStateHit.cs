@@ -13,6 +13,8 @@ public class EnemyStateHit : IEnemyState
 
         Vector3 knockbackForce = (_enemyController.transform.position - _attacker.transform.position).normalized;
         _knockbackTargetPosition = enemyController.transform.position + knockbackForce;
+        
+        _enemyController.EnemyRenderer.material.color = Color.red;
     }
 
     public void Update()
@@ -23,10 +25,15 @@ public class EnemyStateHit : IEnemyState
                 Vector3.Lerp(_enemyController.transform.position, 
                     _knockbackTargetPosition, Time.deltaTime * 5f);
         }
+        
+        _enemyController.EnemyRenderer.material.color = 
+            Color.Lerp(_enemyController.EnemyRenderer.material.color, 
+                Color.white, Time.deltaTime * 5f);
     }
 
     public void Exit()
     {
+        _enemyController.EnemyRenderer.material.color = Color.white;
         _enemyController = null;
     }
 

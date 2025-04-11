@@ -26,6 +26,11 @@ public class EnemyController : MonoBehaviour
     public float MaxPatrolWaitTime => maxPatrolWaitTime;
     [SerializeField] private float maxAttackDistance = 0.5f;
     public float MaxAttackDistance => maxAttackDistance;
+
+    public Renderer EnemyRenderer => enemyRenderer;
+    [SerializeField] private Renderer enemyRenderer;
+    
+    [SerializeField] private HPBarController hpBarController;
     
     // -----
     // 상태 변수
@@ -78,6 +83,7 @@ public class EnemyController : MonoBehaviour
         
         // HP 초기화
         _currentHealth = maxHealth;
+        hpBarController.SetHP(_currentHealth / (float)maxHealth);
         
         // 상태 초기화
         SetState(EnemyState.Idle);
@@ -107,6 +113,8 @@ public class EnemyController : MonoBehaviour
     {
         var attackPower = playerController.AttackPower - defensePower;
         _currentHealth -= attackPower;
+        
+        hpBarController.SetHP(_currentHealth / (float)maxHealth);
 
         if (_currentHealth <= 0)
         {
