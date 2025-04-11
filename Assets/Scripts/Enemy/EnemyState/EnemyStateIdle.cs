@@ -15,8 +15,6 @@ public class EnemyStateIdle : IEnemyState
 
     public void Update()
     {
-        Debug.Log("Enemy Update");
-        
         // 플레이어 감지
         // 일정 거리에 플레이어가 있는지 확인
         var detectPlayerTransform = _enemyController.DetectPlayerInCircle();

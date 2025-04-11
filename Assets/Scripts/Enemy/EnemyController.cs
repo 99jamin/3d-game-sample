@@ -105,7 +105,19 @@ public class EnemyController : MonoBehaviour
 
     public void SetHit(PlayerController playerController)
     {
-        
+        var attackPower = playerController.AttackPower - defensePower;
+        _currentHealth -= attackPower;
+
+        if (_currentHealth <= 0)
+        {
+            // TODO: Dead 처리
+            SetState(EnemyState.Dead);
+        }
+        else
+        {
+            _enemyStateHit.SetAttacker(playerController);
+            SetState(EnemyState.Hit);
+        }
     }
 
     #endregion

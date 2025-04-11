@@ -71,6 +71,9 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
                     var hit = _hits[j];
                     if (!_hitColliders.Contains(hit.collider))
                     {
+                        Time.timeScale = 0f;
+                        StartCoroutine(ResumeTimeScale());
+                        
                         _hitColliders.Add(hit.collider);
                         Notify(hit.collider.gameObject);
                     }
@@ -78,6 +81,12 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
                 _previousPositions[i] = worldPosition;
             }
         }
+    }
+
+    private IEnumerator ResumeTimeScale()
+    {
+        yield return new WaitForSecondsRealtime(3f);
+        Time.timeScale = 1f;
     }
 
     public void Subscribe(IObserver<GameObject> observer)
@@ -103,7 +112,8 @@ public class WeaponController : MonoBehaviour, IObservable<GameObject>
 
     private void OnDestroy()
     {
-        foreach (var observer in _observers)
+        var copyObservers = new List<IObserver<GameObject>>(_observers);
+        foreach (var observer in copyObservers)
         {
             observer.OnCompleted();
         }
