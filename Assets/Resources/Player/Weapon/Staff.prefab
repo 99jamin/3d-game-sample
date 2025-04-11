@@ -77,3 +77,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9372085ab2da74e4c969d6d3281fa271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _triggerZones:
+  - position: {x: 0, y: 0, z: 1}
+    radius: 0.2
+  - position: {x: 0, y: 0, z: 0.65}
+    radius: 0.2
+  - position: {x: 0, y: 0, z: 0.3}
+    radius: 0.2
+  attackPower: 0
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
