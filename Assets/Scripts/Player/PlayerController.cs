@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
     private Vector3 _velocity = Vector3.zero;
     private int _currentHealth = 0;
     private WeaponController _weaponController;
+    private CameraController _cameraController;
 
     private void Awake()
     {
@@ -81,17 +82,30 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
             { PlayerState.Hit, _playerStateHit },
             { PlayerState.Dead, _playerStateDead }
         };
-        SetState(PlayerState.Idle);
         
         // 체력 초기화
         _currentHealth = maxHealth;
-        GameManager.Instance.SetHP((float)_currentHealth / maxHealth);
         
         // 무기 할당
         var staffObject = Resources.Load<GameObject>("Player/Weapon/Staff");
         var staff = Instantiate(staffObject, leftHandTransform).GetComponent<WeaponController>();
         staff.Subscribe(this);
         _weaponController = staff;
+        
+        Init();
+    }
+
+    public void Init()
+    {
+        SetState(PlayerState.Idle);
+        _velocity = Vector3.zero;
+        
+        // 플레이어 체력을 UI에 표시
+        GameManager.Instance.SetHP((float)_currentHealth / maxHealth);
+        
+        // 카메라 설정
+        _cameraController = Camera.main.GetComponent<CameraController>();
+        _cameraController.SetTarget(headTransform);
     }
 
     private void Update()
