@@ -7,6 +7,7 @@ public class PlayerStateDead : MonoBehaviour, IPlayerState
     public void Enter(PlayerController playerController)
     {
         _playerController = playerController;
+        _playerController.Animator.SetTrigger("Dead");
     }
 
     public void Update()

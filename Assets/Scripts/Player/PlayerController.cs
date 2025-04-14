@@ -85,6 +85,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         
         // 체력 초기화
         _currentHealth = maxHealth;
+        GameManager.Instance.SetHP((float)_currentHealth / maxHealth);
         
         // 무기 할당
         var staffObject = Resources.Load<GameObject>("Player/Weapon/Staff");
@@ -118,7 +119,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
             var attackPower = enemyController.AttackPower;
             _currentHealth -= attackPower;
             
-            // TODO: UI에 HP 갱신
+            GameManager.Instance.SetHP((float)_currentHealth / maxHealth);
             
             if (_currentHealth <= 0)
             {

@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
+    [SerializeField] private HPBarController hpBarController;
+    
     private void Start()
     {
         // 커서 설정
@@ -20,6 +22,11 @@ public class GameManager : Singleton<GameManager>
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
         }
+    }
+
+    public void SetHP(float hp)
+    {
+        hpBarController.SetHP(hp);
     }
 
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
