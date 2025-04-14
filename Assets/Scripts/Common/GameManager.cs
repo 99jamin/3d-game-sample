@@ -66,6 +66,9 @@ public class GameManager : Singleton<GameManager>
                 playerObject.transform.position = spawnPoint.transform.position;
                 playerObject.transform.rotation = spawnPoint.transform.rotation;
                 
+                var playerController = playerObject.GetComponent<PlayerController>();
+                playerController.Init();
+                
                 playerObject.SetActive(true);
             }
         }
@@ -103,6 +106,7 @@ public class GameManager : Singleton<GameManager>
         
         AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
         asyncOperation.allowSceneActivation = false;
+        
 
         while (asyncOperation.progress < 0.9f)
         {
