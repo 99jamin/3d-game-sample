@@ -8,12 +8,17 @@ public enum EnemyState { None, Idle, Patrol, Trace, Attack, Hit, Dead }
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IObserver<GameObject>
 {
     [Header("Basic Info")]
     [SerializeField] private int maxHealth = 100;
+
+    public int AttackPower => attackPower;
     [SerializeField] private int attackPower = 10;
+    
     [SerializeField] private int defensePower = 5;
+    public WeaponController Weapon => weapon;
+    [SerializeField] private WeaponController weapon;
     
     [Header("AI")]
     [SerializeField] private float detectCircleRadius = 10f;
@@ -76,6 +81,9 @@ public class EnemyController : MonoBehaviour
     {
         // Ragdoll 비활성화
         SetRagdollEnabled(false);
+        
+        // Weapon Controller 구독
+        weapon.Subscribe(this);
         
         // 상태 객체 생성
         _enemyStateIdle = new EnemyStateIdle();
@@ -233,12 +241,12 @@ public class EnemyController : MonoBehaviour
 
     public void AttackBegin()
     {
-        
+        weapon.AttackStart();
     }
 
     public void AttackEnd()
     {
-        
+        weapon.AttackEnd();
     }
 
     #endregion
@@ -287,5 +295,26 @@ public class EnemyController : MonoBehaviour
          }
      }
 
+     #endregion
+
+     #region 공격 관련
+     public void OnNext(GameObject value)
+     {
+         var playerController = value.GetComponent<PlayerController>();
+         if (playerController)
+         {
+             playerController.SetHit(this, transform.forward);
+         }
+     }
+
+     public void OnError(Exception error)
+     {
+     }
+
+     public void OnCompleted()
+     {
+         weapon.Unsubscribe(this);
+     }
+     
      #endregion
 }

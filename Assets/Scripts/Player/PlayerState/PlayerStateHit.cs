@@ -7,6 +7,7 @@ public class PlayerStateHit : MonoBehaviour, IPlayerState
     public void Enter(PlayerController playerController)
     {
         _playerController = playerController;
+        _playerController.Animator.SetTrigger("Hit");
     }
 
     public void Update()

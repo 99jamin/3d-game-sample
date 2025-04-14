@@ -111,6 +111,28 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         _playerStates[CurrentState].Enter(this);
     }
 
+    public void SetHit(EnemyController enemyController, Vector3 direction)
+    {
+        if (CurrentState != PlayerState.Hit)
+        {
+            var attackPower = enemyController.AttackPower;
+            _currentHealth -= attackPower;
+            
+            // TODO: UI에 HP 갱신
+            
+            if (_currentHealth <= 0)
+            {
+                SetState(PlayerState.Dead);
+            }
+            else
+            {
+                SetState(PlayerState.Hit);
+                Animator.SetFloat("HitPosX", -direction.x);
+                Animator.SetFloat("HitPosZ", -direction.z);
+            }
+        }
+    }
+
     #region 동작 관련
 
     public void Rotate(float x, float z)
