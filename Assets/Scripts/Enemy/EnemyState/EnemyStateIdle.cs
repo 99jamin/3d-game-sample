@@ -8,10 +8,12 @@ public class EnemyStateIdle : IEnemyState
     public void Enter(EnemyController enemyController)
     {
         _enemyController = enemyController;
-        _enemyController.EnemyAnimator.SetBool("Idle", true);    
-        
+        _enemyController.EnemyAnimator.SetBool("Idle", true);
+
         if (_enemyController.Agent.enabled == true)
+        {
             _enemyController.Agent.isStopped = true;
+        }
     }
 
     public void Update()

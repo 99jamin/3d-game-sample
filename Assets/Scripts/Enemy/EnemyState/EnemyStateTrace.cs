@@ -18,8 +18,12 @@ public class EnemyStateTrace : IEnemyState
             _enemyController.SetState(EnemyState.Idle);
             return;
         }
-        _enemyController.Agent.isStopped = false;
-        _enemyController.Agent.SetDestination(_detectPlayerTransform.position);
+
+        if (_enemyController.Agent.enabled == true)
+        {
+            _enemyController.Agent.isStopped = false;
+            _enemyController.Agent.SetDestination(_detectPlayerTransform.position);
+        }
         
         _enemyController.EnemyAnimator.SetBool("Trace", true);
     }
