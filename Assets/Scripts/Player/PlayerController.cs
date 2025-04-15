@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
 {
     [Header("Player")]
     [SerializeField] private int maxHealth = 100;
+
+    public int AttackPower => attackPower;
     [SerializeField] private int attackPower = 10;
     
     [Header("Movement")]
@@ -53,6 +55,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
     private Vector3 _velocity = Vector3.zero;
     private int _currentHealth = 0;
     private WeaponController _weaponController;
+    private CameraController _cameraController;
 
     private void Awake()
     {
@@ -79,7 +82,6 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
             { PlayerState.Hit, _playerStateHit },
             { PlayerState.Dead, _playerStateDead }
         };
-        SetState(PlayerState.Idle);
         
         // 체력 초기화
         _currentHealth = maxHealth;
@@ -89,6 +91,21 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         var staff = Instantiate(staffObject, leftHandTransform).GetComponent<WeaponController>();
         staff.Subscribe(this);
         _weaponController = staff;
+        
+        Init();
+    }
+
+    public void Init()
+    {
+        SetState(PlayerState.Idle);
+        _velocity = Vector3.zero;
+        
+        // 플레이어 체력을 UI에 표시
+        GameManager.Instance.SetHP((float)_currentHealth / maxHealth);
+        
+        // 카메라 설정
+        _cameraController = Camera.main.GetComponent<CameraController>();
+        _cameraController.SetTarget(headTransform);
     }
 
     private void Update()
@@ -107,6 +124,28 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         }
         CurrentState = state;
         _playerStates[CurrentState].Enter(this);
+    }
+
+    public void SetHit(EnemyController enemyController, Vector3 direction)
+    {
+        if (CurrentState != PlayerState.Hit)
+        {
+            var attackPower = enemyController.AttackPower;
+            _currentHealth -= attackPower;
+            
+            GameManager.Instance.SetHP((float)_currentHealth / maxHealth);
+            
+            if (_currentHealth <= 0)
+            {
+                SetState(PlayerState.Dead);
+            }
+            else
+            {
+                SetState(PlayerState.Hit);
+                Animator.SetFloat("HitPosX", -direction.x);
+                Animator.SetFloat("HitPosZ", -direction.z);
+            }
+        }
     }
 
     #region 동작 관련
@@ -160,11 +199,20 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
     
     public void MeleeAttackStart()
     {
+        if (CurrentState == PlayerState.Attack)
+        {
+            _playerStateAttack.IsAttacking = true;
+            _weaponController.AttackStart();
+        }
     }
 
     public void MeleeAttackEnd()
     {
-        
+        if (CurrentState == PlayerState.Attack)
+        {
+            _playerStateAttack.IsAttacking = false;
+            _weaponController.AttackEnd();
+        }
     }
 
     #endregion
@@ -195,7 +243,7 @@ public class PlayerController : MonoBehaviour, IObserver<GameObject>
         var enemyController = value.GetComponent<EnemyController>();
         if (enemyController)
         {
-            // TODO: EnemyController에게 "너 맞았어!"라고 알려주면 됩니다.
+            enemyController.SetHit(this);
         }
     }
 

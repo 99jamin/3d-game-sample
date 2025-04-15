@@ -31,6 +31,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
             DontDestroyOnLoad(gameObject);
             // 씬 전환시 호출되는 액션 메서드 할당
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
         }
         else
         {
@@ -39,4 +40,5 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
     }
 
     protected abstract void OnSceneLoaded(Scene scene, LoadSceneMode mode);
+    protected abstract void OnSceneUnloaded(Scene scene);
 }

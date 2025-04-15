@@ -8,12 +8,17 @@ public enum EnemyState { None, Idle, Patrol, Trace, Attack, Hit, Dead }
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IObserver<GameObject>
 {
     [Header("Basic Info")]
     [SerializeField] private int maxHealth = 100;
+
+    public int AttackPower => attackPower;
     [SerializeField] private int attackPower = 10;
+    
     [SerializeField] private int defensePower = 5;
+    public WeaponController Weapon => weapon;
+    [SerializeField] private WeaponController weapon;
     
     [Header("AI")]
     [SerializeField] private float detectCircleRadius = 10f;
@@ -26,6 +31,16 @@ public class EnemyController : MonoBehaviour
     public float MaxPatrolWaitTime => maxPatrolWaitTime;
     [SerializeField] private float maxAttackDistance = 0.5f;
     public float MaxAttackDistance => maxAttackDistance;
+
+    public Renderer EnemyRenderer => enemyRenderer;
+    [SerializeField] private Renderer enemyRenderer;
+    
+    [SerializeField] private HPBarController hpBarController;
+    
+    [Header("Ragdoll")]
+    [SerializeField] private Collider[] ragdollColliders;
+    [SerializeField] private Rigidbody[] ragdollRigidbodies;
+    [SerializeField] private CharacterJoint[] ragdollJoints;
     
     // -----
     // 상태 변수
@@ -47,6 +62,9 @@ public class EnemyController : MonoBehaviour
     // -----
     // 일반 멤버
     private int _currentHealth;
+    
+    private Collider _collider;
+    private Rigidbody _rigidbody;
 
     private void Awake()
     {
@@ -54,10 +72,19 @@ public class EnemyController : MonoBehaviour
         Agent = GetComponent<NavMeshAgent>();
         Agent.updateRotation = true;
         Agent.updatePosition = false;
+
+        _collider = GetComponent<Collider>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Start()
     {
+        // Ragdoll 비활성화
+        SetRagdollEnabled(false);
+        
+        // Weapon Controller 구독
+        weapon.Subscribe(this);
+        
         // 상태 객체 생성
         _enemyStateIdle = new EnemyStateIdle();
         _enemyStatePatrol = new EnemyStatePatrol();
@@ -78,6 +105,7 @@ public class EnemyController : MonoBehaviour
         
         // HP 초기화
         _currentHealth = maxHealth;
+        hpBarController.SetHP(_currentHealth / (float)maxHealth);
         
         // 상태 초기화
         SetState(EnemyState.Idle);
@@ -101,11 +129,90 @@ public class EnemyController : MonoBehaviour
         _enemyStates[CurrentState].Enter(this);
     }
 
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            SetRagdollEnabled(true);
+            StartCoroutine(Dissolve());
+        }
+    }
+
+    IEnumerator Dissolve()
+    {
+        var propertyBlock = new MaterialPropertyBlock();
+        enemyRenderer.GetPropertyBlock(propertyBlock);
+        var value = 0f;
+        while (value < 1f)
+        {
+            value += Time.deltaTime;
+            propertyBlock.SetFloat("_Cutoff", value);
+            enemyRenderer.SetPropertyBlock(propertyBlock);
+            yield return null;
+        }
+    }
+
+    #region Ragdoll 관련
+
+    private void SetRagdollEnabled(bool isEnabled)
+    {
+        foreach (var ragdollCollider in ragdollColliders)
+        {
+            ragdollCollider.enabled = isEnabled;
+        }
+
+        foreach (var ragdollRigidbody in ragdollRigidbodies)
+        {
+            ragdollRigidbody.detectCollisions = isEnabled;
+            ragdollRigidbody.isKinematic = !isEnabled;
+        }
+        
+        EnemyAnimator.enabled = !isEnabled;
+        
+        _collider.enabled = !isEnabled;
+        _rigidbody.detectCollisions = !isEnabled;
+        
+        EnemyAnimator.Rebind();
+        EnemyAnimator.Update(0f);
+    }
+
+    #endregion
+
     #region Hit 관련
 
-    private void OnTriggerEnter(Collider other)
+    public void SetHit(PlayerController playerController)
     {
-        Debug.Log("## Enemy OnTriggerEnter");
+        var attackPower = playerController.AttackPower - defensePower;
+        _currentHealth -= attackPower;
+        
+        hpBarController.SetHP(_currentHealth / (float)maxHealth);
+
+        if (_currentHealth <= 0)
+        {
+            hpBarController.gameObject.SetActive(false);
+
+            SetState(EnemyState.Dead);
+            
+            Agent.enabled = false;
+            
+            _rigidbody.isKinematic = false;
+            _rigidbody.useGravity = true;
+            _rigidbody.constraints = RigidbodyConstraints.None;
+            
+            var direction = transform.position - playerController.transform.position;
+            direction.y = 1f;
+            direction = direction.normalized;
+            var force = direction * 20f;
+            
+            _rigidbody.AddForce(force, ForceMode.Impulse);
+
+            _collider.isTrigger = false;
+        }
+        else
+        {
+            _enemyStateHit.SetAttacker(playerController);
+            SetState(EnemyState.Hit);
+        }
     }
 
     #endregion
@@ -134,12 +241,12 @@ public class EnemyController : MonoBehaviour
 
     public void AttackBegin()
     {
-        
+        weapon.AttackStart();
     }
 
     public void AttackEnd()
     {
-        
+        weapon.AttackEnd();
     }
 
     #endregion
@@ -188,5 +295,26 @@ public class EnemyController : MonoBehaviour
          }
      }
 
+     #endregion
+
+     #region 공격 관련
+     public void OnNext(GameObject value)
+     {
+         var playerController = value.GetComponent<PlayerController>();
+         if (playerController)
+         {
+             playerController.SetHit(this, transform.forward);
+         }
+     }
+
+     public void OnError(Exception error)
+     {
+     }
+
+     public void OnCompleted()
+     {
+         weapon.Unsubscribe(this);
+     }
+     
      #endregion
 }
